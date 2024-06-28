@@ -37,11 +37,7 @@ void setup() {
   client.setCallback(callback);
   
   initEEPROM(EEPROM_SIZE);
-
-  // uncomment if you add the firmware for the first time for the device. 
-  // eraseCharArrayToEEPROM(0, 22);
-
-  initialize_device();
+  check_provisioned_status();
 }
 
 
@@ -50,21 +46,24 @@ void loop() {
   if (!client.connected()) {
     Serial.println("Client not connected");
     if (devs) {
-    reconnect();
+    device_mqtt_reconnect();
     Serial.println("Client connection completed");
     }
     else {
     Serial.println("Device not provisioned to connect");
-    initial_reconnect();
+    provision_mqtt_reconnect();
     }
   }
 
   if (devs) {
+    
     Serial.println("loop started client already connected publish loop");
     publishmsg();
     Serial.println("publish loop completed ");
+
   }
+
   client.loop();   
 
-  delay(10000); // Publish message every 5 seconds
+  delay(10000); // Publish message every 10 seconds
 }

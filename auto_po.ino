@@ -6,27 +6,9 @@
 
 char* read_credentials(int, int);
 
-void setup_wifi() {
-  delay(10);
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+//connect to the MQTT user to the Thignsboard cloud device
+void device_mqtt_reconnect() {
 
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-}
-
-void reconnect() {
-  
   delay(10);
   accessTokenChar = read_credentials(EEPROM_START_ADDRESS, CHAR_ARRAY_LENGTH);
 
@@ -43,7 +25,8 @@ void reconnect() {
   }
 }
 
-void initial_reconnect() {
+//connect to the MQTT broker for provisioning
+void provision_mqtt_reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting initial MQTT connection for provisioning...");
     if (client.connect("ESP32Client", mqtt_user, mqtt_password)) {
@@ -58,6 +41,7 @@ void initial_reconnect() {
       serializeJson(provision_request, buffer);
       client.publish(provision_request_topic, buffer);
       Serial.println(buffer);
+
     } else {
       Serial.print(" 1 failed, rc=");
       Serial.print(client.state());
@@ -67,7 +51,10 @@ void initial_reconnect() {
   }
 }
 
-void device_provisioned(){
+//successful provisioned status 
+//provision_success
+
+void provision_success(){
       client.disconnect();
       Serial.println("***********************Device provisioned successfully*************************");
       writeEEPROM(0,1);
@@ -75,7 +62,7 @@ void device_provisioned(){
       devs=readEEPROM(0);
 }
 
-
+//copy the const char to char
 void copyConstCharToChar(const char* src, char* dest, int length) {
   // Ensure we don't overflow the destination array
   for (int i = 0; i < length - 1; ++i) {
@@ -85,7 +72,7 @@ void copyConstCharToChar(const char* src, char* dest, int length) {
   dest[length - 1] = '\0'; // Ensure the destination array is null-terminated
 }
 
-
+//on message to decode the provision response
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -114,7 +101,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println("Data written to EEPROM.");
 
   Serial.println("Credentials saved successfully");
-  device_provisioned();
+  provision_success();
   Serial.println("***********************Device provisioned successfully*************************");
 
   } else {
@@ -123,7 +110,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-
+//read credentials from EEProm memory location 
 char* read_credentials(int _EEPROM_START_ADDRESS, int _CHAR_ARRAY_LENGTH) {
   char* Token = readCharArrayFromEEPROM(_EEPROM_START_ADDRESS, _CHAR_ARRAY_LENGTH);
   Serial.print("Data read from EEPROM: ");
@@ -131,21 +118,20 @@ char* read_credentials(int _EEPROM_START_ADDRESS, int _CHAR_ARRAY_LENGTH) {
   return Token;
 }
 
-
-void initialize_device(){
-  // eraseCharArrayToEEPROM(EEPROM_START_ADDRESS, CHAR_ARRAY_LENGTH);
+// check the current provisioning status of the device and redirect to the connection of the mqtt broker
+void check_provisioned_status(){
 
   delay(10);
   devs=readEEPROM(0);
-  Serial.print("Initial status of deivce: ");
+  Serial.print("Initial status of device: ");
   Serial.println(devs);
 
   if (!devs){
-    initial_reconnect();
+    provision_mqtt_reconnect();
   }
   else {
     accessTokenChar = read_credentials(EEPROM_START_ADDRESS, CHAR_ARRAY_LENGTH);
-    reconnect();
+    device_mqtt_reconnect();
   }
-  delay(100);
+  delay(10);
 }
