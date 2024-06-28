@@ -6,8 +6,8 @@
 #include <EEPROM.h>
 
 // WiFi configurations
-const char* ssid = "ABC";
-const char* password = "udeepailu";
+const char* ssid = "WIFI_SSID";
+const char* password = "WIFI_PASSWORD";
 
 //MQTT broker configurations
 const char* mqtt_server = "mqtt.thingsboard.cloud";
@@ -16,8 +16,8 @@ const int mqtt_port = 1883;
 //MQTT configurations
 const char* mqtt_user="provision";
 const char* mqtt_password ="";
-const char* provision_device_key = "oepjp1hx8nr8de7u2kew";
-const char* provision_device_secret = "exmmw9uktmjgoisi7vz7";
+const char* provision_device_key = "PROVISION_DEVICE_KEY";
+const char* provision_device_secret = "PROVISION_DEVICE_SECRET";
 const char* provision_request_topic = "/provision/request";
 const char* provision_response_topic = "/provision/response";
 
