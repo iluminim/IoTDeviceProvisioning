@@ -16,6 +16,10 @@ void device_mqtt_reconnect() {
     Serial.print("Attempting MQTT connection with the device in Thingsboard...");
     if (client.connect("ESP32Client2", accessTokenChar, NULL)) {
       Serial.println("connected to mqtt user device");
+      if(!claimed){
+        sendClaimRequest();
+        claimed=true;
+      }
     } else {
       Serial.print("2 failed, rc=");
       Serial.print(client.state());
@@ -53,13 +57,14 @@ void provision_mqtt_reconnect() {
 
 //successful provisioned status 
 //provision_success
-
+//send claim request
 void provision_success(){
       client.disconnect();
       Serial.println("***********************Device provisioned successfully*************************");
       writeEEPROM(0,1);
       delay(10);
       devs=readEEPROM(0);
+    //  sendClaimRequest();
 }
 
 //copy the const char to char
