@@ -6,6 +6,8 @@
 #include "FS.h"
 #include "SPIFFS.h"
 #include <EEPROM.h>
+#include <stdio.h>
+#include <string.h>
 
 // WiFi configurations
 const char* ssid = "WIFI_SSID";
@@ -27,6 +29,8 @@ char* accessTokenChar = new char[20];
 
 bool devs;
 const int EEPROM_SIZE = 1024; // EEPROM size in bytes
+
+bool claimed = false;
 
 WiFiClient espClient;
 PubSubClient client(espClient);

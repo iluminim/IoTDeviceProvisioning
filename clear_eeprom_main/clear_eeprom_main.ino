@@ -27,5 +27,5 @@ void setup() {
 
 void loop(){
   Serial.println("Memory cleared. Done");
-  delay(100);
+  delay(10000);
 }

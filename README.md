@@ -7,4 +7,6 @@ Version : 1.0
 This includes device provisioning firmware for ESP32 based IoT devices using Thingsboard platform
 
 Supporting Hardware: ESP32 
-Here testing 
+
+Device claiming added on 05/07/2024
+
